@@ -1,0 +1,42 @@
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+kind: AzureCluster
+metadata:
+  labels:
+    azure-operator.giantswarm.io/version: 5.0.1
+    cluster.x-k8s.io/cluster-name: 2mw4b
+    giantswarm.io/cluster: 2mw4b
+    giantswarm.io/organization: giantswarm
+    release.giantswarm.io/version: 13.0.1
+  name: 2mw4b
+  namespace: default
+spec:
+  controlPlaneEndpoint:
+    host: api.2mw4b.k8s.test.westeurope.azure.gigantic.io
+    port: 443
+  location: westeurope
+  networkSpec:
+    subnets:
+      - cidrBlocks:
+          - 10.11.1.0/24
+        name: nodepool1
+        role: node
+        routeTable: {}
+        securityGroup: {}
+      - cidrBlocks:
+          - 10.11.2.0/24
+        name: 2mw4b-control-plane
+        role: control-plane
+        routeTable: {}
+        securityGroup: {}
+    vnet:
+      cidrBlocks:
+        - 10.11.0.0/16
+      name: 2mw4b-VirtualNetwork
+      resourceGroup: 2mw4b
+    apiServerLB:
+      frontendIPs:
+        - name: 2mw4b-API-PublicLoadBalancer-Frontend
+      name: 2mw4b-API-PublicLoadBalancer
+      sku: Standard
+      type: Public
+  resourceGroup: 2mw4b

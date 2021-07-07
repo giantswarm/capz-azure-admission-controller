@@ -13,11 +13,10 @@ local_resource(
 
 docker_build_with_restart(
   'giantswarm/capz-azure-admission-controller',
-  './build',
-  dockerfile='./Dockerfile',
-  entrypoint=['/app/manager'],
+  '.',
+  entrypoint=['/app/build/manager'],
   live_update=[
-    sync('./build', '/app'),
+    sync('./build', '/app/build/'),
   ],
 )
 
@@ -25,7 +24,7 @@ k8s_yaml(kustomize('./config/default'))
 
 # Add task to create an AzureCluster CR to test the admission controller.
 local_resource(
-  'apply AzureCluster with empty rules',
+  'azureCluster with empty rules',
   'kubectl delete --ignore-not-found=true -f azurecluster.yaml && kubectl apply -f azurecluster.yaml && kubectl get -f azurecluster.yaml -o yaml',
   auto_init=False,
   trigger_mode=TRIGGER_MODE_MANUAL)

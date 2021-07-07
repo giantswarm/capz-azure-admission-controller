@@ -1,4 +1,4 @@
 FROM alpine
 WORKDIR /app
-ADD manager manager
+ADD build/manager build/manager
 ENTRYPOINT ["manager"]

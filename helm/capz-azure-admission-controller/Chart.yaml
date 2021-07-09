@@ -1,0 +1,10 @@
+apiVersion: v1
+appVersion: '[[ .AppVersion ]]'
+description: A Helm chart for capz-azure-admission-controller
+home: https://github.com/giantswarm/capz-azure-admission-controller
+name: capz-azure-admission-controller
+sources:
+  - https://github.com/giantswarm/capz-azure-admission-controller
+version: [[ .Version ]]
+annotations:
+  config.giantswarm.io/version: 1.x.x

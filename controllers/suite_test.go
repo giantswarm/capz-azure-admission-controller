@@ -22,13 +22,18 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
+
 	// +kubebuilder:scaffold:imports
 )
 
@@ -52,7 +57,14 @@ var _ = BeforeSuite(func(done Done) {
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths: []string{filepath.Join("..", "config", "crd", "bases")},
+		// CAPZ CRDs need to be registered on the `testEnv` api server
+		CRDDirectoryPaths:     []string{filepath.Join("../../cluster-api-provider-azure", "config", "crd", "bases")},
+		ErrorIfCRDPathMissing: true,
+		// This makes `testEnv` to configure our webhook, although we need to actually start the server later on
+		WebhookInstallOptions: envtest.WebhookInstallOptions{
+			DirectoryPaths:           []string{filepath.Join("..", "config", "webhook")},
+			IgnoreErrorIfPathMissing: false,
+		},
 	}
 
 	var err error
@@ -60,11 +72,34 @@ var _ = BeforeSuite(func(done Done) {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(cfg).ToNot(BeNil())
 
+	err = capz.AddToScheme(scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = apiextensionsv1.AddToScheme(scheme.Scheme)
+	Expect(err).NotTo(HaveOccurred())
+
 	// +kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).ToNot(HaveOccurred())
 	Expect(k8sClient).ToNot(BeNil())
+
+	// We need to set `Host`, `Port` or `CertDir` so that the manager starts our webhook with the same configuration that `testEnv` has used.
+	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+		Scheme:  scheme.Scheme,
+		Host:    testEnv.WebhookInstallOptions.LocalServingHost,
+		Port:    testEnv.WebhookInstallOptions.LocalServingPort,
+		CertDir: testEnv.WebhookInstallOptions.LocalServingCertDir,
+	})
+	Expect(err).ToNot(HaveOccurred())
+
+	k8sManager.GetWebhookServer().Register("/mutate-exp-infrastructure-cluster-x-k8s-io-v1alpha3-azurecluster", &webhook.Admission{Handler: &AzureClusterMutator{Client: k8sManager.GetClient()}})
+
+	go func() {
+		defer GinkgoRecover()
+		err = k8sManager.Start(ctrl.SetupSignalHandler())
+		Expect(err).ToNot(HaveOccurred())
+	}()
 
 	close(done)
 }, 60)

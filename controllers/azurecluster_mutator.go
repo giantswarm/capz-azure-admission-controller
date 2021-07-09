@@ -36,6 +36,17 @@ func (a *AzureClusterMutator) Handle(ctx context.Context, req admission.Request)
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	a.setControlPlaneSecurityRules(azureCluster)
+
+	marshaledAzureCluster, err := json.Marshal(azureCluster)
+	if err != nil {
+		return admission.Errored(http.StatusInternalServerError, err)
+	}
+
+	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledAzureCluster)
+}
+
+func (a AzureClusterMutator) setControlPlaneSecurityRules(azureCluster *capz.AzureCluster) {
 	// We need to pass the management cluster CIDR somehow, like passing arguments when installing this app.
 	managementClusterCIDR := ""
 
@@ -121,13 +132,6 @@ func (a *AzureClusterMutator) Handle(ctx context.Context, req admission.Request)
 		Destination:      to.StringPtr("VirtualNetwork"),
 		DestinationPorts: to.StringPtr(etcdPort),
 	})
-
-	marshaledAzureCluster, err := json.Marshal(azureCluster)
-	if err != nil {
-		return admission.Errored(http.StatusInternalServerError, err)
-	}
-
-	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledAzureCluster)
 }
 
 // InjectDecoder injects the decoder.

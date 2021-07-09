@@ -3,12 +3,32 @@ version: 2.1
 orbs:
   architect: giantswarm/architect@2.8.0
 
+executors:
+  architect:
+    docker:
+      - entrypoint: /bin/bash
+        image: quay.io/giantswarm/architect:3.7.1
+
+jobs:
+  go-build:
+    executor: architect
+    steps:
+      - checkout
+      - architect/tools-info
+      - run: git clone https://github.com/kubernetes-sigs/cluster-api-provider-azure ./../cluster-api-provider-azure
+      - architect/go-cache-restore
+      - architect/go-build:
+          os: linux
+          binary: capz-azure-admission-controller
+      - architect/go-cache-save
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./capz-azure-admission-controller
 workflows:
   build:
     jobs:
-      - architect/go-build:
-          name: go-build
-          binary: capz-azure-admission-controller
+      - go-build:
           filters:
             tags:
               only: /^v.*/

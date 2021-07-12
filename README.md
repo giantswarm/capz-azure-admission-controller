@@ -15,4 +15,8 @@ make kind-reset
 
 ### Tests
 The automated tests rely on the CAPZ repository to be present on the filesystem so that we can register the CAPZ CRDs.
-It needs to be at the same level than this repository under the name `cluster-api-provider-azure`.
+It needs to be at the same level that this repository under the name `cluster-api-provider-azure`.
+
+```
+make test
+```

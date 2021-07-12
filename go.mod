@@ -1,6 +1,6 @@
 module github.com/giantswarm/capz-azure-admission-controller
 
-go 1.13
+go 1.16
 
 require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0

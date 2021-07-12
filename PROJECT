@@ -1,3 +1,6 @@
 domain: giantswarm.io
+layout:
+- go.kubebuilder.io/v3
+projectName: capz-azure-admission-controller
 repo: github.com/giantswarm/capz-azure-admission-controller
-version: "2"
+version: "3"

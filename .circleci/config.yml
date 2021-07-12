@@ -17,6 +17,7 @@ jobs:
       - architect/tools-info
       - run: git clone https://github.com/kubernetes-sigs/cluster-api-provider-azure ./../cluster-api-provider-azure
       - architect/go-cache-restore
+      - run: make test
       - architect/go-build:
           os: linux
           binary: capz-azure-admission-controller

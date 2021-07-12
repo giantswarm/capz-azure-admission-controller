@@ -20,7 +20,7 @@ docker_build_with_restart(
   ],
 )
 
-k8s_yaml(kustomize('./config/default'))
+k8s_yaml(kustomize('./config/dev'))
 
 # Add task to create an AzureCluster CR to test the admission controller.
 local_resource(

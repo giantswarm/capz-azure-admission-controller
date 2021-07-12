@@ -69,7 +69,7 @@ func main() {
 	}
 
 	setupLog.Info("registering webhooks to the webhook server")
-	mgr.GetWebhookServer().Register("/mutate-exp-infrastructure-cluster-x-k8s-io-v1alpha3-azurecluster", &webhook.Admission{Handler: &controllers.AzureClusterMutator{Client: mgr.GetClient()}})
+	mgr.GetWebhookServer().Register("/mutate-exp-infrastructure-cluster-x-k8s-io-v1alpha3-azurecluster", &webhook.Admission{Handler: &controllers.AzureClusterMutator{Client: mgr.GetClient(), Logger: ctrl.Log.WithName("controllers").WithName("Cluster")}})
 	//mgr.GetWebhookServer().Register("/validate-v1-pod", &webhook.Admission{Handler: &podValidator{Client: mgr.GetClient()}})
 
 	// +kubebuilder:scaffold:builder

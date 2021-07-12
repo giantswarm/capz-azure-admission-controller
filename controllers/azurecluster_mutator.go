@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/go-logr/logr"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
@@ -25,23 +26,28 @@ const (
 
 type AzureClusterMutator struct {
 	Client  client.Client
+	Logger  logr.Logger
 	decoder *admission.Decoder
 }
 
 func (a *AzureClusterMutator) Handle(ctx context.Context, req admission.Request) admission.Response {
 	azureCluster := &capz.AzureCluster{}
-
+	logger := a.Logger.WithValues("hey", "ho")
+	logger.Info("BEFORE DECODING")
 	err := a.decoder.Decode(req, azureCluster)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	logger.Info("BEFORE APPLYING RULES")
 	a.setControlPlaneSecurityRules(azureCluster)
+	logger.Info("AFTER APPLYING RULES")
 
 	marshaledAzureCluster, err := json.Marshal(azureCluster)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
+	logger.WithValues("marshalledAzureCluster", marshaledAzureCluster).Info("AFTER MARSHALLING")
 
 	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledAzureCluster)
 }

@@ -92,7 +92,7 @@ var _ = BeforeSuite(func(done Done) {
 	})
 	Expect(err).ToNot(HaveOccurred())
 
-	k8sManager.GetWebhookServer().Register("/mutate-exp-infrastructure-cluster-x-k8s-io-v1alpha3-azurecluster", &webhook.Admission{Handler: &AzureClusterMutator{Client: k8sManager.GetClient()}})
+	k8sManager.GetWebhookServer().Register("/mutate-exp-infrastructure-cluster-x-k8s-io-v1alpha3-azurecluster", &webhook.Admission{Handler: &AzureClusterMutator{Client: k8sManager.GetClient(), Logger: ctrl.Log.WithName("controllers").WithName("Cluster")}})
 
 	go func() {
 		defer GinkgoRecover()

@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0
+	github.com/go-logr/logr v0.1.0
 	github.com/onsi/ginkgo v1.14.2
 	github.com/onsi/gomega v1.10.3
 	k8s.io/api v0.18.6

@@ -10,6 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capz "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var _ = Describe("AzureClusterMutator", func() {
@@ -41,16 +42,19 @@ var _ = Describe("AzureClusterMutator", func() {
 				Expect(err).NotTo(HaveOccurred())
 			}()
 
+			fetchedAzureCluster := &capz.AzureCluster{}
 			Eventually(func() error {
-				return k8sClient.Get(ctx, client.ObjectKey{Name: azureCluster.Name, Namespace: azureCluster.Namespace}, azureCluster)
+				return k8sClient.Get(ctx, client.ObjectKey{Name: azureCluster.Name, Namespace: azureCluster.Namespace}, fetchedAzureCluster)
 			}, time.Second*5, time.Millisecond*500).Should(BeNil())
 
-			cpSubnet := azureCluster.Spec.NetworkSpec.GetControlPlaneSubnet()
+			cpSubnet := fetchedAzureCluster.Spec.NetworkSpec.GetControlPlaneSubnet()
 			Expect(cpSubnet).ShouldNot(BeNil())
+
+			logf.Log.V(0).Info("fetched AzureCluster", "fetchedAzureCluster", fetchedAzureCluster)
 
 			Expect(cpSubnet.SecurityGroup.IngressRules).Should(ContainElement(&capz.IngressRule{
 				Name:             "allow_load_balancer",
-				Description:      "Allow all TCP traffic from LB to master instance",
+				Description:      "Allow asd TCP traffic from LB to master instance",
 				Priority:         3902,
 				Protocol:         capz.SecurityGroupProtocolTCP,
 				Source:           to.StringPtr("AzureLoadBalancer"),

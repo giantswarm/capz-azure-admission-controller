@@ -19,20 +19,16 @@ jobs:
       - architect/tools-info
       - run: git clone https://github.com/giantswarm/cluster-api-provider-azure ./../cluster-api-provider-azure && cd ./../cluster-api-provider-azure && git checkout v0.4.12-gsalpha3
       - architect/go-cache-restore
-      - run: mkdir -p ./testbin
-      - run: curl -sSLo ./testbin/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
+      - run: mkdir -p ./testbin && curl -sSLo ./testbin/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
       - run: source ./testbin/setup-envtest.sh; fetch_envtest_tools ./testbin
-      - run: ls -lah /root
-      - run: ls -lah /root/project/
-      - run: ls -lah /root/project/testbin/bin
       - architect/go-build:
           os: linux
-          binary: capz-azure-admission-controller
+          binary: build/manager
       - architect/go-cache-save
       - persist_to_workspace:
           root: .
           paths:
-            - ./capz-azure-admission-controller
+            - ./build/manager
 workflows:
   build:
     jobs:

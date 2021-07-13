@@ -54,7 +54,7 @@ var _ = Describe("AzureClusterMutator", func() {
 
 			Expect(cpSubnet.SecurityGroup.IngressRules).Should(ContainElement(&capz.IngressRule{
 				Name:             "allow_load_balancer",
-				Description:      "Allow asd TCP traffic from LB to master instance",
+				Description:      "Allow all TCP traffic from LB to master instance",
 				Priority:         3902,
 				Protocol:         capz.SecurityGroupProtocolTCP,
 				Source:           to.StringPtr("AzureLoadBalancer"),

@@ -15,7 +15,7 @@ jobs:
     steps:
       - checkout
       - architect/tools-info
-      - run: git clone https://github.com/giantswarm/cluster-api-provider-azure ./../cluster-api-provider-azure
+      - run: git clone https://github.com/giantswarm/cluster-api-provider-azure ./../cluster-api-provider-azure && cd ./../cluster-api-provider-azure && git checkout v0.4.12-gsalpha3
       - architect/go-cache-restore
       - run: make test
       - architect/go-build:

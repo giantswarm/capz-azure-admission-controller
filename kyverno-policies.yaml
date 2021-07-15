@@ -1,0 +1,65 @@
+---
+apiVersion: application.giantswarm.io/v1alpha1
+kind: AppCatalog
+metadata:
+  labels:
+    app-operator.giantswarm.io/version: 1.0.0
+    application.giantswarm.io/catalog-type: test
+    application.giantswarm.io/catalog-visibility: internal
+  name: control-plane-test-catalog
+spec:
+  config:
+    configMap:
+      name: ""
+      namespace: ""
+    secret:
+      name: ""
+      namespace: ""
+  description: 'This catalog holds test Apps exclusively running on Giant Swarm control
+    planes. '
+  logoURL: /images/repo_icons/giantswarm.png
+  storage:
+    URL: https://giantswarm.github.io/control-plane-test-catalog/
+    type: helm
+  title: Control Plane Test Catalog
+---
+apiVersion: application.giantswarm.io/v1alpha1
+kind: App
+metadata:
+  annotations:
+    chart-operator.giantswarm.io/force-helm-upgrade: "true"
+    config.giantswarm.io/version: v1
+  labels:
+    app-operator.giantswarm.io/version: 0.0.0
+    app.kubernetes.io/name: policies-azure
+    argocd.argoproj.io/instance: policies-azure
+  name: policies-azure
+  namespace: giantswarm
+spec:
+  catalog: control-plane-test-catalog
+  config:
+    configMap:
+      name: ""
+      namespace: ""
+    secret:
+      name: ""
+      namespace: ""
+  install: {}
+  kubeConfig:
+    context:
+      name: ""
+    inCluster: true
+    secret:
+      name: ""
+      namespace: ""
+  name: policies-azure
+  namespace: giantswarm
+  namespaceConfig: {}
+  userConfig:
+    configMap:
+      name: ""
+      namespace: ""
+    secret:
+      name: ""
+      namespace: ""
+  version: 0.0.2

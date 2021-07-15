@@ -72,7 +72,7 @@ kind-reset: ## Destroys the kind cluster created for tilt.
 ##@ Build
 
 build: generate fmt vet ## Build manager binary
-	go build -o build/manager main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/manager -ldflags '-w' ./
 
 run: generate fmt vet manifests ## Run against the configured Kubernetes cluster in ~/.kube/config
 	go run ./main.go

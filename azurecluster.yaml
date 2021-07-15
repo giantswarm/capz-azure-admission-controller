@@ -1,3 +1,25 @@
+---
+apiVersion: cluster.x-k8s.io/v1alpha3
+kind: Cluster
+metadata:
+  annotations:
+    cluster.giantswarm.io/description: my-cluster
+  labels:
+    azure-operator.giantswarm.io/version: 5.7.0
+    cluster-operator.giantswarm.io/version: 0.27.1
+    cluster.x-k8s.io/cluster-name: 2mw4b
+    giantswarm.io/cluster: 2mw4b
+    giantswarm.io/organization: giantswarm
+    release.giantswarm.io/version: 20.0.0
+  name: 2mw4b
+  namespace: default
+spec:
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+    kind: AzureCluster
+    name: 2mw4b
+    namespace: default
+---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: AzureCluster
 metadata:
@@ -6,7 +28,6 @@ metadata:
     cluster.x-k8s.io/cluster-name: 2mw4b
     giantswarm.io/cluster: 2mw4b
     giantswarm.io/organization: giantswarm
-    release.giantswarm.io/version: 13.0.1
   name: 2mw4b
   namespace: default
 spec:

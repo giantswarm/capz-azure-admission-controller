@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  architect: giantswarm/architect@4.0.0
+  architect: giantswarm/architect@4.35.5
 
 executors:
   architect:
@@ -17,9 +17,11 @@ jobs:
     steps:
       - checkout
       - architect/tools-info
-      - run: git clone https://github.com/giantswarm/cluster-api-provider-azure ./../cluster-api-provider-azure && cd ./../cluster-api-provider-azure && git checkout v0.4.12-gsalpha3
+      - run: git clone https://github.com/giantswarm/cluster-api-provider-azure ./../cluster-api-provider-azure
+          && cd ./../cluster-api-provider-azure && git checkout v0.4.12-gsalpha3
       - architect/go-cache-restore
-      - run: mkdir -p ./testbin && curl -sSLo ./testbin/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
+      - run: mkdir -p ./testbin && curl -sSLo ./testbin/setup-envtest.sh 
+          https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
       - run: source ./testbin/setup-envtest.sh; fetch_envtest_tools ./testbin
       - architect/go-build:
           os: linux
@@ -37,15 +39,11 @@ workflows:
             tags:
               only: /^v.*/
 
-      - architect/push-to-docker:
-          context: "architect"
-          name: push-capz-azure-admission-controller-to-quay
-          image: "quay.io/giantswarm/capz-azure-admission-controller"
-          username_envar: "QUAY_USERNAME"
-          password_envar: "QUAY_PASSWORD"
+      - architect/push-to-registries:
+          context: architect
+          name: push-to-registries
           requires:
             - go-build
-          # Needed to trigger job also on git tag.
           filters:
             tags:
               only: /^v.*/
@@ -57,8 +55,7 @@ workflows:
           app_catalog_test: "control-plane-test-catalog"
           chart: "capz-azure-admission-controller"
           requires:
-            - push-capz-azure-admission-controller-to-quay
-          # Needed to trigger job also on git tag.
+            - push-to-registries
           filters:
             tags:
               only: /^v.*/
